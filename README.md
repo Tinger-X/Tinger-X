@@ -70,8 +70,7 @@
 
 ## 🐍 GitHub Contribution Snake
 
-<!-- START_SNAKE -->
-<!-- END_SNAKE -->
+![](https://raw.githubusercontent.com/Tinger-X/Tinger-X/main/assets/github-contribution-grid-snake.svg)
 
 ---
 
