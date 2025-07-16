@@ -10,42 +10,57 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      # 第一步：生成蛇形图
-      - name: Generate snake.svg
-        id: snake-gen
-        uses: Platane/snk@v2
-        with:
-          github_user_name: ${{ github.repository_owner }}
-          outputs: assets/github-snake.svg?theme=dark
-          config: |
-            {
-              "size": 12,
-              "colors": {
-                "background": "#0d1117",
-                "grid": "#161b22",
-                "snake": "#3fb950"
-              }
-            }
-        
-      # 第二步：检出仓库
+      # 1. 检出仓库以便获取配置文件
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           path: main-repo
           
-      # 第三步：创建或更新蛇形图文件
-      - name: Create/Update snake file
+      # 2. 创建配置文件（替代之前的config参数）
+      - name: Create config file
+        run: |
+          cat > config.tmp << 'EOT'
+          {
+            "size": 12,
+            "colors": {
+              "background": "${{ secrets.BG_COLOR || '#0d1117' }}",
+              "grid": "${{ secrets.GRID_COLOR || '#161b22' }}",
+              "snake": "${{ secrets.SNAKE_COLOR || '#3fb950' }}",
+              "label": "${{ secrets.LABEL_COLOR || '#c9d1d9' }}"
+            },
+            "pattern": "squares",
+            "direction": "boustrophedon",
+            "skip_uncovered": false
+          }
+          EOT
+          
+          # 生成临时配置文件
+          mv config.tmp .snkrc
+          cat .snkrc
+          
+          # 创建输出目录
+          mkdir -p outputs
+          
+      # 3. 使用正确的参数格式生成蛇形图
+      - name: Generate snake.svg
+        uses: Platane/snk@v2
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          outputs: |
+            outputs/github-snake.svg?theme=dark
+            outputs/github-snake-light.svg?theme=light
+            
+      # 4. 将生成的蛇形图移动到仓库
+      - name: Move snake to repository
         run: |
           # 确保assets目录存在
           mkdir -p main-repo/assets
           
-          # 移动生成的蛇形图到仓库目录
-          find . -name "github-snake.svg" -exec mv {} main-repo/assets \;
+          # 移动生成的蛇形图
+          mv outputs/github-snake.svg main-repo/assets/github-snake.svg
+          mv outputs/github-snake-light.svg main-repo/assets/github-snake-light.svg
           
-          # 创建提交日志
-          echo "🔄 Last update: $(date)" > update.log
-          
-      # 第四步：更新README（独立步骤）
+      # 5. 更新README中的蛇形图部分
       - name: Update README with snake
         run: |
           cd main-repo
@@ -55,31 +70,22 @@ jobs:
             echo -e "\n<!-- START_SNAKE -->\n<!-- END_SNAKE -->" >> README.md
           fi
           
-          # 更新蛇形图部分
+          # 更新蛇形图部分（支持亮色/暗色模式）
           sed -i '/<!-- START_SNAKE -->/,/<!-- END_SNAKE -->/{//!d}' README.md
-          sed -i '/<!-- START_SNAKE -->/a ![GitHub Contribution Snake](assets/github-snake.svg "My contribution activity")' README.md
+          sed -i '/<!-- START_SNAKE -->/a <picture>' README.md
+          sed -i '/<picture>/a   <source media="(prefers-color-scheme: dark)" srcset="assets/github-snake.svg">' README.md
+          sed -i '/<picture>/a   <source media="(prefers-color-scheme: light)" srcset="assets/github-snake-light.svg">' README.md
+          sed -i '/<picture>/a   <img alt="GitHub Contribution Snake" src="assets/github-snake.svg">' README.md
+          sed -i '/<picture>/a </picture>' README.md
           
-          # 添加状态日志
-          echo -e "\n🐍 Last updated: $(date)" >> update.log
-          
-      # 第五步：提交更改（使用专门的提交动作）
+      # 6. 提交更改
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           repository: main-repo
           branch: main
-          commit_message: "Update GitHub contribution snake - $(date)"
+          commit_message: "Update GitHub contribution snake - $(date +'%Y-%m-%d')"
           file_pattern: |
             README.md
             assets/github-snake.svg
-            update.log
-            
-  # 可选的结束通知步骤
-  notify:
-    needs: generate
-    runs-on: ubuntu-latest
-    steps:
-      - name: Show completion message
-        run: |
-          echo "✅ GitHub contribution snake has been successfully updated!"
-          echo "➡️ Updated at: $(date)"
+            assets/github-snake-light.svg
