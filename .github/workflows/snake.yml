@@ -1,99 +1,33 @@
-name: Generate Contribution Snake
+# GitHub Action for generating a contribution graph with a snake eating your contributions.
+
+name: Generate Snake
 
 on:
   schedule:
-    - cron: "0 0 * * *"  # 每天UTC时间0点更新一次
-  workflow_dispatch:      # 允许手动触发
+    - cron: "0 0 * * *"
+  workflow_dispatch:
 
 jobs:
-  generate:
+  build:
     runs-on: ubuntu-latest
-    
+
     steps:
-      # 1. 检出仓库
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          path: main-repo
-          
-      # 2. 生成简单蛇形图（避免复杂参数）
-      - name: Generate basic snake
-        id: snake-gen
-        uses: Platane/snk@v2
+      
+      - name: Generate Snake
+        uses: Platane/snk@v3
+        id: snake-gif
         with:
           github_user_name: ${{ github.repository_owner }}
-          outputs: snake-basic.svg
-          
-      # 3. 生成自定义蛇形图（使用单一查询参数）
-      - name: Generate custom snake
-        id: custom-snake
-        run: |
-          # 构建安全的自定义参数
-          BG_COLOR="0d1117"
-          GRID_COLOR="161b22"
-          SNAKE_COLOR="3fb950"
-          
-          # 通过curl生成蛇形图
-          curl "https://contrib.rocks/image?repo=${{ github.repository_owner }}/${{ github.repository_owner }}&palette=$BG_COLOR-$GRID_COLOR-$SNAKE_COLOR" -o custom-snake.svg
-          
-          # 保存路径供后续步骤使用
-          echo "SNAKE_PATH=custom-snake.svg" >> $GITHUB_ENV
-          
-      # 4. 移动蛇形图到仓库
-      - name: Move snakes to repository
-        run: |
-          # 确保assets目录存在
-          mkdir -p main-repo/assets
-          
-          # 移动两种蛇形图
-          mv snake-basic.svg main-repo/assets/snake-basic.svg
-          mv ${{ env.SNAKE_PATH }} main-repo/assets/snake-custom.svg
-          
-      # 5. 安全更新README中的蛇形图部分
-      - name: Update README with snake
-        run: |
-          cd main-repo
-          
-          # 确保README中存在锚点
-          if ! grep -q "<!-- START_SNAKE -->" README.md; then
-            echo -e "\n<!-- START_SNAKE -->\n<!-- END_SNAKE -->" >> README.md
-          fi
-          
-          # 删除旧内容并添加新内容
-          if grep -q "<!-- START_SNAKE -->" README.md; then
-            # 获取锚点行号
-            start_line=$(grep -n "<!-- START_SNAKE -->" README.md | cut -d: -f1)
-            end_line=$(grep -n "<!-- END_SNAKE -->" README.md | cut -d: -f1)
-            
-            # 删除旧内容
-            if [ -n "$start_line" ] && [ -n "$end_line" ] && [ $end_line -gt $start_line ]; then
-              sed -i "${start_line},${end_line}d" README.md
-            fi
-          fi
-          
-          # 添加新内容
-          echo "<!-- START_SNAKE -->" >> README.md
-          echo "## 🐍 My Contribution Activity" >> README.md
-          echo "![Basic Snake](assets/snake-basic.svg)" >> README.md
-          echo "![Custom Snake](assets/snake-custom.svg)" >> README.md
-          echo "<!-- END_SNAKE -->" >> README.md
-          
-      # 6. 提交更改
-      - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          repository: main-repo
-          branch: main
-          commit_message: "Update GitHub snake - $(date +'%Y-%m-%d')"
-          file_pattern: |
-            README.md
-            assets/snake-*
+          outputs: |
+            ./assets/github-contribution-grid-snake.svg
+            ./assets/github-contribution-grid-snake-dark.svg?palette=github-dark
+            ./assets/github-contribution-grid-snake.gif
+            ./assets/github-contribution-grid-snake-dark.gif?palette=github-dark
 
-  # 可选：成功后通知
-  notify:
-    needs: generate
-    runs-on: ubuntu-latest
-    if: ${{ success() }}
-    steps:
-      - name: Success notification
-        run: echo "Snake generated successfully at $(date)" >> $GITHUB_STEP_SUMMARY
+      - name: Push to GitHub
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'Generate Contribution Snake'
+          branch: main
