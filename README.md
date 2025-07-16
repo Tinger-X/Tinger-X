@@ -182,7 +182,7 @@ jobs:
 ---
 
 <p align="right">
-🔄 Last Updated: <!-- TIMESTAMP -->
+🔄 Last Updated: 2025-07-16 08:56 UTC
 </p>
 
 <div align="center">
