@@ -1,9 +1,9 @@
-name: Generate Snake
+name: Generate Contribution Snake
 
 on:
   schedule:
-    - cron: "0 0 * * *"
-  workflow_dispatch:
+    - cron: "0 0 * * *"  # 每天UTC时间0点更新一次
+  workflow_dispatch:      # 允许手动触发
 
 jobs:
   generate:
@@ -12,14 +12,30 @@ jobs:
       - name: Generate snake.svg
         uses: Platane/snk@master
         with:
-          github_user_name: Tinger-X
-          svg_out_path: assets/snake.svg
-      - uses: actions/checkout@v4
-      - name: Update readme
-        run: |
-          sed -i '/snake_start/,/snake_end/ {/snake_start/!{/snake_end/!d}}' README.md
-          sed -i '/snake_start/r assets/snake.svg' README.md
-        shell: bash
-      - uses: stefanzweifel/git-auto-commit-action@v4
+          github_user_name: ${{ github.repository_owner }} # 自动使用仓库所有者用户名
+          svg_output_path: assets/github-snake.svg # 生成的svg保存路径
+    
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          commit_message: "Update snake.svg"
+          path: main-repo
+
+      - name: Move snake.svg to assets
+        run: |
+          mkdir -p main-repo/assets
+          mv assets/github-snake.svg main-repo/assets/github-snake.svg
+          
+      - name: Update README with the new snake
+        run: |
+          cd main-repo
+          # 在README中查找注释标记并替换内容
+          sed -i '/<!-- START_SNAKE -->/,/<!-- END_SNAKE -->/{//!d}' README.md
+          sed -i '/<!-- START_SNAKE -->/ r assets/github-snake.svg' README.md
+        shell: bash
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          repository: main-repo
+          branch: main
+          commit_message: "Update GitHub Contribution Snake"
