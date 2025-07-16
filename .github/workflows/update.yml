@@ -8,10 +8,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        
       - name: Update README
         run: |
-          echo -e "🔄 Last Updated: $(date '+%Y-%m-%d %H:%M')" >> README.md
+          # 生成新的时间戳
+          NEW_TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
+          
+          # 仅替换时间戳标签内的内容
+          sed -i -e "s|<!-- TIMESTAMP -->|$NEW_TIMESTAMP|g" README.md
+          
+          # 显示更新信息
+          echo "Updated timestamp to: $NEW_TIMESTAMP"
+      
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "📅 Update timestamp"
+          commit_message: "🔄 Timestamp update"
