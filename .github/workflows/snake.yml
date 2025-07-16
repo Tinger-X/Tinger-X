@@ -2,75 +2,84 @@ name: Generate Contribution Snake
 
 on:
   schedule:
-    - cron: "0 0 * * *"
-  workflow_dispatch:
+    - cron: "0 0 * * *"  # 每天UTC时间0点更新一次
+  workflow_dispatch:      # 允许手动触发
 
 jobs:
   generate:
     runs-on: ubuntu-latest
-    outputs:
-      snake-created: ${{ steps.snake-gen.outputs.snake_generated }}
     
     steps:
+      # 第一步：生成蛇形图
       - name: Generate snake.svg
         id: snake-gen
         uses: Platane/snk@v2
         with:
           github_user_name: ${{ github.repository_owner }}
-        # 输出文件名保存在环境变量
-        run: echo "svg_path=github-snake.svg" >> $GITHUB_OUTPUT
-
+          outputs: assets/github-snake.svg?theme=dark
+          config: |
+            {
+              "size": 12,
+              "colors": {
+                "background": "#0d1117",
+                "grid": "#161b22",
+                "snake": "#3fb950"
+              }
+            }
+        
+      # 第二步：检出仓库
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           path: main-repo
-
-      - name: Move snake.svg to assets
-        run: |
-          mkdir -p main-repo/assets
-          cp ${{ steps.snake-gen.outputs.svg_path }} main-repo/assets/${{ steps.snake-gen.outputs.svg_path }}
           
-      - name: Update README with the new snake
+      # 第三步：创建或更新蛇形图文件
+      - name: Create/Update snake file
+        run: |
+          # 确保assets目录存在
+          mkdir -p main-repo/assets
+          
+          # 移动生成的蛇形图到仓库目录
+          find . -name "github-snake.svg" -exec mv {} main-repo/assets \;
+          
+          # 创建提交日志
+          echo "🔄 Last update: $(date)" > update.log
+          
+      # 第四步：更新README（独立步骤）
+      - name: Update README with snake
         run: |
           cd main-repo
-          # 使用更可靠的替换方法
-          if grep -q "<!-- START_SNAKE -->" README.md; then
-            start_line=$(grep -n "<!-- START_SNAKE -->" README.md | cut -d: -f1)
-            end_line=$(grep -n "<!-- END_SNAKE -->" README.md | cut -d: -f1)
-            if [ -n "$start_line" ] && [ -n "$end_line" ]; then
-              sed -i "${start_line},${end_line}d" README.md
-              sed -i "${start_line}i <!-- START_SNAKE -->" README.md
-              sed -i "${start_line}a <img src=\"assets/${{ steps.snake-gen.outputs.svg_path }}\" alt=\"GitHub Contribution Snake\">" README.md
-              sed -i "${start_line}a <!-- END_SNAKE -->" README.md
-            fi
-          else
-            # 添加新标记
-            echo -e "\n<!-- START_SNAKE -->\n<img src=\"assets/${{ steps.snake-gen.outputs.svg_path }}\" alt=\"GitHub Contribution Snake\">\n<!-- END_SNAKE -->" >> README.md
+          
+          # 确保README中存在锚点
+          if ! grep -q "<!-- START_SNAKE -->" README.md; then
+            echo -e "\n<!-- START_SNAKE -->\n<!-- END_SNAKE -->" >> README.md
           fi
-
+          
+          # 更新蛇形图部分
+          sed -i '/<!-- START_SNAKE -->/,/<!-- END_SNAKE -->/{//!d}' README.md
+          sed -i '/<!-- START_SNAKE -->/a ![GitHub Contribution Snake](assets/github-snake.svg "My contribution activity")' README.md
+          
+          # 添加状态日志
+          echo -e "\n🐍 Last updated: $(date)" >> update.log
+          
+      # 第五步：提交更改（使用专门的提交动作）
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           repository: main-repo
           branch: main
-          commit_message: "📦 Update GitHub Contribution Snake"
-        env:
-          # 设置输出变更状态
-          GIT_AUTO_COMMIT_MESSAGE: "📦 Updated snake at $(date)"
-        # 在commit步骤设置输出
-        run: echo "commit_message=📦 Updated snake at $(date)" >> $GITHUB_OUTPUT
-
+          commit_message: "Update GitHub contribution snake - $(date)"
+          file_pattern: |
+            README.md
+            assets/github-snake.svg
+            update.log
+            
+  # 可选的结束通知步骤
   notify:
-    name: Notify Update
     needs: generate
-    if: ${{ always() && needs.generate.outputs.snake-created == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Send notification
+      - name: Show completion message
         run: |
-          echo "Snake updated at $(date)"
-          echo "Commit: ${{ needs.generate.outputs.commit_message }}"
-        # 使用环境变量传递消息
-        env:
-          UPDATE_MESSAGE: "Snake updated successfully"
-        run: echo "$UPDATE_MESSAGE" >> $GITHUB_STEP_SUMMARY
+          echo "✅ GitHub contribution snake has been successfully updated!"
+          echo "➡️ Updated at: $(date)"
