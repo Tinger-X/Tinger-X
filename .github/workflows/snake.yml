@@ -1,0 +1,25 @@
+name: Generate Snake
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate snake.svg
+        uses: Platane/snk@master
+        with:
+          github_user_name: Tinger-X
+          svg_out_path: assets/snake.svg
+      - uses: actions/checkout@v4
+      - name: Update readme
+        run: |
+          sed -i '/snake_start/,/snake_end/ {/snake_start/!{/snake_end/!d}}' README.md
+          sed -i '/snake_start/r assets/snake.svg' README.md
+        shell: bash
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Update snake.svg"
