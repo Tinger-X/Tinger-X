@@ -1,0 +1,17 @@
+name: Update Profile README
+on:
+  schedule:
+    - cron: '0 0 * * *'   # 每天UTC 0:00自动运行
+  workflow_dispatch:       # 允许手动触发
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update README
+        run: |
+          echo -e "🔄 Last Updated: $(date '+%Y-%m-%d %H:%M')" >> README.md
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "📅 Update timestamp"
