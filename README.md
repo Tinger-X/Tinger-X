@@ -68,10 +68,10 @@
   <img src="https://github-readme-streak-stats.herokuapp.com/?user=Tinger-X&theme=tokyonight" alt="Streak">
 </p>
 
-<!-- GitHub贡献图（贪吃蛇特效） -->
-<p align="center">
-  <img src="https://raw.githubusercontent.com/Tinger-X/Tinger-X/output/github-contribution-grid-snake.svg" alt="Contribution Snake">
-</p>
+## 🐍 GitHub Contribution Snake
+
+<!-- START_SNAKE -->
+<!-- END_SNAKE -->
 
 ---
 
