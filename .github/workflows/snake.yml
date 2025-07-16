@@ -10,57 +10,46 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      # 1. 检出仓库以便获取配置文件
+      # 1. 检出仓库
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           path: main-repo
           
-      # 2. 创建配置文件（替代之前的config参数）
-      - name: Create config file
-        run: |
-          cat > config.tmp << 'EOT'
-          {
-            "size": 12,
-            "colors": {
-              "background": "${{ secrets.BG_COLOR || '#0d1117' }}",
-              "grid": "${{ secrets.GRID_COLOR || '#161b22' }}",
-              "snake": "${{ secrets.SNAKE_COLOR || '#3fb950' }}",
-              "label": "${{ secrets.LABEL_COLOR || '#c9d1d9' }}"
-            },
-            "pattern": "squares",
-            "direction": "boustrophedon",
-            "skip_uncovered": false
-          }
-          EOT
-          
-          # 生成临时配置文件
-          mv config.tmp .snkrc
-          cat .snkrc
-          
-          # 创建输出目录
-          mkdir -p outputs
-          
-      # 3. 使用正确的参数格式生成蛇形图
-      - name: Generate snake.svg
+      # 2. 生成简单蛇形图（避免复杂参数）
+      - name: Generate basic snake
+        id: snake-gen
         uses: Platane/snk@v2
         with:
           github_user_name: ${{ github.repository_owner }}
-          outputs: |
-            outputs/github-snake.svg?theme=dark
-            outputs/github-snake-light.svg?theme=light
-            
-      # 4. 将生成的蛇形图移动到仓库
-      - name: Move snake to repository
+          outputs: snake-basic.svg
+          
+      # 3. 生成自定义蛇形图（使用单一查询参数）
+      - name: Generate custom snake
+        id: custom-snake
+        run: |
+          # 构建安全的自定义参数
+          BG_COLOR="0d1117"
+          GRID_COLOR="161b22"
+          SNAKE_COLOR="3fb950"
+          
+          # 通过curl生成蛇形图
+          curl "https://contrib.rocks/image?repo=${{ github.repository_owner }}/${{ github.repository_owner }}&palette=$BG_COLOR-$GRID_COLOR-$SNAKE_COLOR" -o custom-snake.svg
+          
+          # 保存路径供后续步骤使用
+          echo "SNAKE_PATH=custom-snake.svg" >> $GITHUB_ENV
+          
+      # 4. 移动蛇形图到仓库
+      - name: Move snakes to repository
         run: |
           # 确保assets目录存在
           mkdir -p main-repo/assets
           
-          # 移动生成的蛇形图
-          mv outputs/github-snake.svg main-repo/assets/github-snake.svg
-          mv outputs/github-snake-light.svg main-repo/assets/github-snake-light.svg
+          # 移动两种蛇形图
+          mv snake-basic.svg main-repo/assets/snake-basic.svg
+          mv ${{ env.SNAKE_PATH }} main-repo/assets/snake-custom.svg
           
-      # 5. 更新README中的蛇形图部分
+      # 5. 安全更新README中的蛇形图部分
       - name: Update README with snake
         run: |
           cd main-repo
@@ -70,13 +59,24 @@ jobs:
             echo -e "\n<!-- START_SNAKE -->\n<!-- END_SNAKE -->" >> README.md
           fi
           
-          # 更新蛇形图部分（支持亮色/暗色模式）
-          sed -i '/<!-- START_SNAKE -->/,/<!-- END_SNAKE -->/{//!d}' README.md
-          sed -i '/<!-- START_SNAKE -->/a <picture>' README.md
-          sed -i '/<picture>/a   <source media="(prefers-color-scheme: dark)" srcset="assets/github-snake.svg">' README.md
-          sed -i '/<picture>/a   <source media="(prefers-color-scheme: light)" srcset="assets/github-snake-light.svg">' README.md
-          sed -i '/<picture>/a   <img alt="GitHub Contribution Snake" src="assets/github-snake.svg">' README.md
-          sed -i '/<picture>/a </picture>' README.md
+          # 删除旧内容并添加新内容
+          if grep -q "<!-- START_SNAKE -->" README.md; then
+            # 获取锚点行号
+            start_line=$(grep -n "<!-- START_SNAKE -->" README.md | cut -d: -f1)
+            end_line=$(grep -n "<!-- END_SNAKE -->" README.md | cut -d: -f1)
+            
+            # 删除旧内容
+            if [ -n "$start_line" ] && [ -n "$end_line" ] && [ $end_line -gt $start_line ]; then
+              sed -i "${start_line},${end_line}d" README.md
+            fi
+          fi
+          
+          # 添加新内容
+          echo "<!-- START_SNAKE -->" >> README.md
+          echo "## 🐍 My Contribution Activity" >> README.md
+          echo "![Basic Snake](assets/snake-basic.svg)" >> README.md
+          echo "![Custom Snake](assets/snake-custom.svg)" >> README.md
+          echo "<!-- END_SNAKE -->" >> README.md
           
       # 6. 提交更改
       - name: Commit changes
@@ -84,8 +84,16 @@ jobs:
         with:
           repository: main-repo
           branch: main
-          commit_message: "Update GitHub contribution snake - $(date +'%Y-%m-%d')"
+          commit_message: "Update GitHub snake - $(date +'%Y-%m-%d')"
           file_pattern: |
             README.md
-            assets/github-snake.svg
-            assets/github-snake-light.svg
+            assets/snake-*
+
+  # 可选：成功后通知
+  notify:
+    needs: generate
+    runs-on: ubuntu-latest
+    if: ${{ success() }}
+    steps:
+      - name: Success notification
+        run: echo "Snake generated successfully at $(date)" >> $GITHUB_STEP_SUMMARY
