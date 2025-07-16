@@ -13,7 +13,7 @@ jobs:
         uses: Platane/snk@master
         with:
           github_user_name: ${{ github.repository_owner }} # 自动使用仓库所有者用户名
-          svg_output_path: assets/github-snake.svg # 生成的svg保存路径
+          svg_out_path: assets/github-snake.svg # 生成的svg保存路径
     
       - name: Checkout repository
         uses: actions/checkout@v4
