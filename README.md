@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&pause=1000&center=true&width=435&lines=%F0%9F%91%8B+Hi%2C+I'm+[Your_Name];%F0%9F%92%BB+Full-Stack+Developer;%F0%9F%93%9D+Open+Source+Contributor" alt="Typing SVG">
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&pause=1000&center=true&width=435&lines=%F0%9F%91%8B+Hi%2C+I'm+[Tinger-X];%F0%9F%92%BB+Full-Stack+Developer;%F0%9F%93%9D+Open+Source+Contributor" alt="Typing SVG">
 </p>
 
 <div align="center">
@@ -9,7 +9,7 @@
 <h3 align="center">✨ About Me ✨</h3>
 <p align="center">
   Passionate developer specializing in building high-performance web applications.
-  <br>Currently creating innovative solutions at [Company/Organization].
+  <br>Currently creating innovative solutions at [HDU/EIS].
   <br>Open to collaboration on exciting projects!
 </p>
 
