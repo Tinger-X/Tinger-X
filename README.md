@@ -15,6 +15,37 @@
 
 ---
 
+## 🚀 Featured Projects
+
+| Project                                                                      | Description                                                                    |
+|------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
+| **[Cloudflare-Wx-Api](https://github.com/Tinger-X/cloudflare-wx-api)**       | `Cloudflare.workers` as Wechat public account's backend                        |
+| **[Cloudflare-Web-Nav](https://github.com/Tinger-X/cloudflare-web-nav)**     | Your personal web navigation page without any ads.                             |
+| **[Cloudflare-Wx-Notice](https://github.com/Tinger-X/cloudflare-wx-notice)** | A `POST` request to send notifications to your wechat                          |
+| **[Blog](https://github.com/Tinger-X/blog)**                                 | Cloudflare based blog, not static                                              |
+| **[MatSpecRCNN](https://github.com/Tinger-X/MatSpecRCNN)**                   | A Multispectral Mask R-CNN for Joint Object Detection and Material Recognition |
+| **[AudioReverse](https://github.com/Tinger-X/audio-reverse)**                | Reverse any audio, see: [audio-reverse](https://audio.tinger.host/)            |
+
+---
+
+## 🐍 GitHub Contribution
+
+![](https://raw.githubusercontent.com/Tinger-X/Tinger-X/main/assets/github-contribution-grid-snake.svg)
+
+---
+
+## 📈 GitHub Statistics
+
+<p align="center">
+  <img height="180em" src="https://github-readme-stats.vercel.app/api?username=Tinger-X&show_icons=true&theme=tokyonight&include_all_commits=true&count_private=true" alt="Stats">
+  <img height="180em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=Tinger-X&layout=compact&theme=tokyonight" alt="Languages">
+</p>
+<p align="center">
+  <img src="https://github-readme-streak-stats.herokuapp.com/?user=Tinger-X&theme=tokyonight" alt="Streak">
+</p>
+
+---
+
 ## 🔧 Technical Stack
 
 ### 🧠 Programming Languages
@@ -54,38 +85,6 @@
 ![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
 ![Cloudflare](https://img.shields.io/badge/Cloudflare-F58220?style=for-the-badge&logo=cloudflare&logoColor=white)
 ![Linux](https://img.shields.io/badge/Linux-2B406D?style=for-the-badge&logo=linux&logoColor=white)
-
----
-
-## 📈 GitHub Statistics
-
-<p align="center">
-  <img height="180em" src="https://github-readme-stats.vercel.app/api?username=Tinger-X&show_icons=true&theme=tokyonight&include_all_commits=true&count_private=true" alt="Stats">
-  <img height="180em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=Tinger-X&layout=compact&theme=tokyonight" alt="Languages">
-</p>
-
-<p align="center">
-  <img src="https://github-readme-streak-stats.herokuapp.com/?user=Tinger-X&theme=tokyonight" alt="Streak">
-</p>
-
-## 🐍 GitHub Contribution Snake
-
-![](https://raw.githubusercontent.com/Tinger-X/Tinger-X/main/assets/github-contribution-grid-snake.svg)
-
----
-
-## 🚀 Featured Projects
-
-| Project                                                                      | Description                                                                    |
-|------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
-| **[Cloudflare-Wx-Api](https://github.com/Tinger-X/cloudflare-wx-api)**       | `Cloudflare.workers` as Wechat public account's backend                        |
-| **[Cloudflare-Web-Nav](https://github.com/Tinger-X/cloudflare-web-nav)**     | Your personal web navigation page without any ads.                             |
-| **[Cloudflare-Wx-Notice](https://github.com/Tinger-X/cloudflare-wx-notice)** | A `POST` request to send notifications to your wechat                          |
-| **[Blog](https://github.com/Tinger-X/blog)**                                 | Cloudflare based blog, not static                                              |
-| **[MatSpecRCNN](https://github.com/Tinger-X/MatSpecRCNN)**                   | A Multispectral Mask R-CNN for Joint Object Detection and Material Recognition |
-| **[AudioReverse](https://github.com/Tinger-X/audio-reverse)**                | Reverse any audio, see: [audio-reverse](https://audio.tinger.host/)            |
-
----
 
 ## 🌐 Connect With Me
 
