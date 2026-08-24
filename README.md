@@ -89,10 +89,10 @@
 ## 🌐 Connect With Me
 
 <p align="center">
-  <a href="mailto:email@tingerx.com">
+  <a href="mailto:mail@tin.edu.kg">
     <img src="https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email">
   </a>
-  <a href="mailto:email@tinger.host">
+  <a href="mailto:tinger.xxx@foxmail.com">
     <img src="https://img.shields.io/badge/Email-1DA1F2?style=for-the-badge&logo=gmail&logoColor=white" alt="Email">
   </a>
   <a href="mailto:xxx.tinger@gmail.com">
